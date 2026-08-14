@@ -1,0 +1,46 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: {{ template "helm-guestbook.fullname" . }}-smoke-test
+spec:
+  metrics:
+    - name: preview-http-smoke-test
+      provider:
+        job:
+          spec:
+            backoffLimit: 0
+            activeDeadlineSeconds: 60
+            template:
+              spec:
+                restartPolicy: Never
+                containers:
+                  - name: smoke-test
+                    image: public.ecr.aws/eks/networking-e2e-test-images/curlimages/curl:latest
+                    command:
+                      - /bin/sh
+                      - -c
+                    args:
+                      - |
+                        set -eu
+
+                        url="http://{{ template "helm-guestbook.fullname" . }}-preview:{{ .Values.service.port }}/"
+
+                        for attempt in 1 2 3 4 5; do
+                          echo "Testing ${url}, attempt ${attempt}"
+
+                          if curl \
+                            --fail \
+                            --silent \
+                            --show-error \
+                            --max-time 5 \
+                            --output /dev/null \
+                            "${url}"; then
+                            echo "Smoke test passed"
+                            exit 0
+                          fi
+
+                          sleep 3
+                        done
+
+                        echo "Smoke test failed"
+                        exit 1
