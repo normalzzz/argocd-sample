@@ -19,6 +19,9 @@ spec:
       activeService: {{ template "helm-guestbook.fullname" . }}
       previewService: {{ template "helm-guestbook.fullname" . }}-preview
       autoPromotionEnabled: false
+      prePromotionAnalysis:
+        templates:
+          - templateName: {{ template "helm-guestbook.fullname" . }}-smoke-test
   template:
     metadata:
       labels:
