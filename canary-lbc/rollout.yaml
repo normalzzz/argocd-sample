@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: rollouts-demo
-          image: 073070604328.dkr.ecr.cn-north-1.amazonaws.com.cn/argoproj/rollouts-demo:green
+          image: 073070604328.dkr.ecr.cn-north-1.amazonaws.com.cn/argoproj/rollouts-demo:yellow
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
