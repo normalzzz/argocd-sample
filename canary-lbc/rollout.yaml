@@ -1,0 +1,69 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: rollouts-demo
+  namespace: canary-lab
+spec:
+  replicas: 4
+  revisionHistoryLimit: 3
+  progressDeadlineSeconds: 600
+
+  selector:
+    matchLabels:
+      app: rollouts-demo
+
+  template:
+    metadata:
+      labels:
+        app: rollouts-demo
+    spec:
+      containers:
+        - name: rollouts-demo
+          image: 073070604328.dkr.ecr.cn-north-1.amazonaws.com.cn/argoproj/rollouts-demo:blue
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 2
+            periodSeconds: 3
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              cpu: 100m
+              memory: 64Mi
+
+  strategy:
+    canary:
+      stableService: rollouts-demo-stable
+      canaryService: rollouts-demo-canary
+
+      maxUnavailable: 0
+      maxSurge: "100%"
+
+      trafficRouting:
+        alb:
+          ingress: rollouts-demo
+          rootService: rollouts-demo-root
+          servicePort: 80
+
+      steps:
+        - setWeight: 10
+        - pause:
+            duration: 60s
+
+        - setWeight: 25
+        - pause: {}
+
+        - setWeight: 50
+        - pause:
+            duration: 60s
+
+        - setWeight: 100
+        - pause:
+            duration: 30s
