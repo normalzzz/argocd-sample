@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: rollouts-demo
-          image: argoproj/rollouts-demo:yellow
+          image: argoproj/rollouts-demo:blue
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
@@ -43,27 +43,21 @@ spec:
       stableService: rollouts-demo-stable
       canaryService: rollouts-demo-canary
 
-      maxUnavailable: 0
-      maxSurge: "100%"
-
       trafficRouting:
-        alb:
-          ingress: rollouts-demo
-          rootService: rollouts-demo-root
-          servicePort: 80
-
+        istio:
+          virtualService:
+            name: rollouts-demo-vsvc
+            routes:
+              - primary
       steps:
         - setWeight: 10
         - pause:
             duration: 60s
-
         - setWeight: 25
         - pause: {}
-
         - setWeight: 50
         - pause:
             duration: 60s
-
         - setWeight: 100
         - pause:
             duration: 30s

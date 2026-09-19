@@ -1,0 +1,15 @@
+apiVersion: networking.istio.io/v1
+kind: Gateway
+metadata:
+  name: rollouts-demo-gateway
+  namespace: canary-lab
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+    - port:
+        number: 89
+        name: http
+        protocol: HTTP
+      hosts:
+        - "*"

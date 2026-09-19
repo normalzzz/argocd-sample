@@ -1,0 +1,27 @@
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: rollouts-demo-vsvc
+  namespace: canary-lab
+spec:
+  hosts:
+    - "*"
+  gateways:
+    - rollouts-demo-gateway
+  http:
+    - name: primary
+      match:
+        - uri:
+            prefix: /sample-service
+      route:
+        - destination:
+            host: rollouts-demo-stable
+            port:
+              number: 80
+          weight: 100
+
+        - destination:
+            host: rollouts-demo-canary
+            port:
+              number: 80
+          weight: 0
