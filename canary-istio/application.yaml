@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: canary-istio
+  namespace: default
+spec:
+  destination:
+    namespace: default
+    server: https://kubernetes.default.svc
+  ignoreDifferences:
+  - group: networking.istio.io
+    jqPathExpressions:
+    - .spec.http[].route[].weight
+    kind: VirtualService
+  project: default
+  source:
+    path: canary-istio
+    repoURL: <repo url>
+    targetRevision: master
+  syncPolicy:
+    syncOptions:
+    - ApplyOutOfSyncOnly=true
+    - RespectIgnoreDifferences=true
