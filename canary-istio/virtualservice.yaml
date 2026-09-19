@@ -12,7 +12,7 @@ spec:
     - name: primary
       match:
         - uri:
-            prefix: /sample-service
+            prefix: /
       route:
         - destination:
             host: rollouts-demo-stable
